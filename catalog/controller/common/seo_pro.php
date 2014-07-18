@@ -98,9 +98,29 @@ class ControllerCommonSeoPro extends Controller {
 
 			$rows = array();
 			foreach ($parts as $keyword) {
-				if (isset($this->cache_data['keywords'][$keyword])) {
-					$rows[] = array('keyword' => $keyword, 'query' => $this->cache_data['keywords'][$keyword]);
-				}
+				
+				if (isset($bits)) {
+					if($bits[0] == "category_id"){
+                    $query = $this->db->query("SELECT a.* FROM " . DB_PREFIX . "url_alias a, " . DB_PREFIX . "category c WHERE a.keyword = '" . $this->db->escape($keyword) . "' AND a.query=CONCAT('category_id=', c.category_id) AND c.parent_id='".$bits[1]."'");
+                    if ($query->num_rows) {
+                        $rows[] = array('keyword' => $keyword, 'query' => $query->row['query']);
+                        $bits = explode("=",$query->row['query']);
+                        
+                    }
+                    else{
+                    	$query = $this->db->query("SELECT a.* FROM " . DB_PREFIX . "url_alias a WHERE a.keyword = '" . $this->db->escape($keyword) . "'");
+                    	if ($query->num_rows) {
+                        	$rows[] = array('keyword' => $keyword, 'query' => $query->row['query']);
+                        	$bits = explode("=",$query->row['query']);
+                    	}
+                    }
+					}
+                } else {
+                    if (isset($this->cache_data['keywords'][$keyword])) {
+                       $rows[] = array('keyword' => $keyword, 'query' => $this->cache_data['keywords'][$keyword]);
+                       $bits = explode("=",$this->cache_data['keywords'][$keyword]);
+                    }    
+                }
 			}
 
 			if (count($rows) == sizeof($parts)) {
@@ -178,6 +198,24 @@ class ControllerCommonSeoPro extends Controller {
 
 		switch ($route) {
 			case 'product/product':
+				if (isset($data['product_id'])) {
+					$tmp = $data;
+					
+					$data = array();
+					if ($this->config->get('config_seo_url_include_path')) { 
+						if(isset($tmp['path'])){
+							$tmp_categories = explode('_', $tmp['path']);
+							$data['path'] = $this->getPathByCategory(end($tmp_categories));
+						}
+						else
+							$data['path'] = $this->getPathByProduct($tmp['product_id']);
+						if (!$data['path']) return $link;
+					}
+					$data['product_id'] = $tmp['product_id'];
+					if (isset($tmp['tracking'])) {
+						$data['tracking'] = $tmp['tracking'];
+					}
+				}
 				if (isset($data['product_id'])) {
 					$tmp = $data;
 					$data = array();
