@@ -1,3 +1,19 @@
+# Note
+
+This fork brings back functionality of original seo_url file and thus somewhat uncanonical. This version of seo_pro enables you to have multiple catalogs with the same keywords within different parents like so:
+
+example.com/xxx/yyy/item.html
+
+and
+
+example.com/zzz/yyy/item2.html
+
+There was a solution for it somewhere on the internet for the early version of seo_pro. This one reproduces given functionality preserving cache advantages.
+
+*this version do not replace seo_pro's behavior but simply introduces new (actually original) feature*
+
+=============================
+
 # Seo Pro: INSTALLATION
 
 Tested on Opencart v1.5.6.4 (oc1564).
